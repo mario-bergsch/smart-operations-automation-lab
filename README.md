@@ -17,6 +17,17 @@ Deploy smart operations workflows (like AI Shift Handover) into a production-rea
 
 ---
 
+## Key Features
+
+- **Kubernetes-native:** k3s on Proxmox for lightweight, production-ready orchestration
+- **Workflow Automation:** n8n for low-code, event-driven workflow pipelines
+- **AI Integration:** Claude API for intelligent report generation and decision support
+- **Full Observability:** Prometheus + Grafana dashboards, Alertmanager for incident routing
+- **Shift Handover Automation:** SBAR/RCA reports generated automatically from shift notes
+- **Scalable Architecture:** Namespace isolation, persistent storage, Harbor container registry
+
+---
+
 ## Current Status (as of 2026-06-04)
 
 | Component | Status | Target |
@@ -36,89 +47,14 @@ Deploy smart operations workflows (like AI Shift Handover) into a production-rea
 
 ---
 
-## Architecture
-
-```
-┌─────────────────────────────────────┐
-│    Smart Operations Platform        │
-└─────────────────────────────────────┘
-           ↓
-┌─────────────────────────────────────┐
-│  Kubernetes (k3s on Proxmox)        │
-│                                     │
-│  ┌──────────────────────────────┐  │
-│  │ Namespace: automation        │  │
-│  │ ├─ n8n (Workflows)           │  │
-│  │ ├─ MongoDB (State)           │  │
-│  │ └─ Redis (Cache)             │  │
-│  └──────────────────────────────┘  │
-│                                     │
-│  ┌──────────────────────────────┐  │
-│  │ Namespace: monitoring        │  │
-│  │ ├─ Prometheus                │  │
-│  │ ├─ Grafana                   │  │
-│  │ └─ Alertmanager              │  │
-│  └──────────────────────────────┘  │
-│                                     │
-│  ┌──────────────────────────────┐  │
-│  │ Namespace: registry          │  │
-│  │ └─ Harbor (Container Images) │  │
-│  └──────────────────────────────┘  │
-└─────────────────────────────────────┘
-           ↓
-     ┌─────────────────┐
-     │ Persistent      │
-     │ Volume Claims   │
-     └─────────────────┘
-```
-
----
-
-## What's Planned (Phase 2-3)
-
-### Workflows
-
-**Shift Handover Automation**
-```
-New shift notes detected
-  ↓
-n8n triggers Claude AI SBAR/RCA prompts
-  ↓
-Generate structured reports
-  ↓
-Post to Slack #shift-reports
-  ↓
-Archive to Obsidian knowledge base
-```
-
-**Smart KPI Reporting**
-- Aggregate production data from SAP/MES
-- Calculate real-time OEE
-- Auto-escalate when metrics exceed thresholds
-
-**Quality Issue Automation**
-- Parse quality problems
-- Trigger RCA workflow
-- Assign to teams
-- Track closure time
-
-### Monitoring & Alerts
-
-- Production metrics dashboard (Grafana)
-- Workflow execution logs (Loki)
-- Alert routing to Slack/Email
-- SLA tracking
-
----
-
-## Getting Started (Phase 2)
+## Getting Started
 
 ### Prerequisites
 - Proxmox cluster (3 nodes, 8+ GB RAM each)
 - Linux admin knowledge
 - Docker experience (helpful but not required)
 
-### Deploy (when Phase 2 ready)
+### Deploy
 
 ```bash
 # 1. Set up k3s cluster
@@ -142,6 +78,31 @@ Full deployment guide coming July 2026.
 
 ---
 
+## How to Use / Examples
+
+### Check Platform Status
+```bash
+kubectl get pods --all-namespaces
+kubectl get nodes
+```
+
+### Trigger Shift Handover Workflow (Phase 2)
+```bash
+curl -X POST http://n8n.smart-ops.local/webhook/shift-handover \\
+  -H "Content-Type: application/json" \\
+  -d '{"shift": "morning", "notes": "Line 3 stopped at 06:45 due to material jam. Resolved 07:10."}'
+```
+
+### View Dashboards
+- Grafana: `http://grafana.smart-ops.local`
+- Prometheus: `http://prometheus.smart-ops.local`
+- n8n UI: `http://n8n.smart-ops.local`
+
+### Working Example
+See [ai-shift-handover-system](https://github.com/mario-bergsch/ai-shift-handover-system) for a fully working example of AI-powered shift report generation (MVP validated, 12/12 tests passed).
+
+---
+
 ## Technology Stack
 
 | Component | Technology | Purpose |
@@ -157,41 +118,9 @@ Full deployment guide coming July 2026.
 
 ---
 
-## Repository Structure
-
-```
-smart-operations-automation-lab/
-├── README.md (this file)
-├── LICENSE (MIT)
-├── /kubernetes/
-│   ├── namespace.yaml (k3s setup)
-│   ├── pvc-storage.yaml (persistent volumes)
-│   ├── n8n-deployment.yaml
-│   ├── n8n-service.yaml
-│   ├── prometheus-deployment.yaml
-│   ├── grafana-deployment.yaml
-│   └── harbor-deployment.yaml
-├── /workflows/
-│   ├── shift-handover-automation.json
-│   ├── smart-kpi-reporting.json
-│   └── quality-escalation.json
-├── /monitoring/
-│   ├── prometheus-config.yaml
-│   ├── grafana-dashboards.yaml
-│   └── alerting-rules.yaml
-├── /docs/
-│   ├── DEPLOYMENT.md
-│   ├── OPERATIONS.md
-│   └── ROADMAP.md
-└── /scripts/
-    └── setup-cluster.sh
-```
-
----
-
 ## Roadmap
 
-### Phase 1: Foundation (May - June 2026) ✅
+### Phase 1: Foundation (May - June 2026)
 - [x] Proxmox cluster setup
 - [ ] k3s cluster initialization
 - [ ] Storage configuration
@@ -206,23 +135,14 @@ smart-operations-automation-lab/
 - [ ] First workflow deployment (Shift Handover)
 - [ ] SAP OData integration
 - [ ] Production monitoring
-- [ ] Team training & documentation
-
-### Phase 4: Scale (September+ 2026) 📋
-- [ ] Multi-cluster setup
-- [ ] Disaster recovery
-- [ ] Advanced analytics
 
 ---
 
 ## For Recruiters / Companies
 
-This lab demonstrates:
-
 - **Infrastructure as Code:** Kubernetes manifests, declarative infrastructure
 - **Platform Engineering:** Building production-ready automation platforms
 - **DevOps Practices:** Monitoring, logging, alerting, scaling
-- **Integration Design:** Connecting disparate systems (n8n, Claude, SAP, Slack)
 - **Manufacturing Focus:** Domain expertise in production operations
 
 Interested in Smart Operations Platform as a Service? Let's talk.
@@ -235,6 +155,6 @@ MIT License - See LICENSE file
 
 ---
 
-**Created:** 2026-06-04  
-**Status:** Active Development  
+**Created:** 2026-06-04
+**Status:** Active Development
 **Deadline:** 2026-06-30 (Phase 1-3)
