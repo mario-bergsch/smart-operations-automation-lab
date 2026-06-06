@@ -1,4 +1,6 @@
-# Smart Operations Automation Lab
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Kubernetes 1.28+](https://img.shields.io/badge/Kubernetes-1.28+-blue.svg)](https://kubernetes.io/)
+[![n8n Latest](https://img.shields.io/badge/n8n-latest-orange.svg)](https://n8n.io/)# Smart Operations Automation Lab
 
 **Status:** 🔄 In Development | **Phase:** Infrastructure Build (Deadline: 2026-06-30)
 
