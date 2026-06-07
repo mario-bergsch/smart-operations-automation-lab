@@ -1,0 +1,138 @@
+{
+  "name": "Hermes API Health Check",
+  "description": "Monitors Hermes API health status every 5 minutes",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        }
+      },
+      "id": "trigger-cron",
+      "name": "Cron Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://hermes-api:8000/api/health",
+        "method": "GET",
+        "responseFormat": "json"
+      },
+      "id": "node-http-request",
+      "name": "Get Health Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "value2": "ready",
+              "operation": "equals"
+            }
+          ]
+        }
+      },
+      "id": "node-if-healthy",
+      "name": "Is Healthy?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  timestamp: new Date().toISOString(),\n  status: 'healthy',\n  vaultAccessible: $('Get Health Status').first().json.vault_accessible,\n  gitAccessible: $('Get Health Status').first().json.git_accessible,\n  vaultPath: $('Get Health Status').first().json.vault_path\n}"
+      },
+      "id": "node-healthy-response",
+      "name": "Healthy Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        850,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  timestamp: new Date().toISOString(),\n  status: 'unhealthy',\n  error: 'API did not return status=ready',\n  response: $('Get Health Status').first().json\n}"
+      },
+      "id": "node-unhealthy-response",
+      "name": "Unhealthy Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        850,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "Cron Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Health Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Health Status": {
+      "main": [
+        [
+          {
+            "node": "Is Healthy?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Healthy?": {
+      "main": [
+        [
+          {
+            "node": "Healthy Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unhealthy Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "errorWorkflow": "",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all"
+  },
+  "staticData": null
+}

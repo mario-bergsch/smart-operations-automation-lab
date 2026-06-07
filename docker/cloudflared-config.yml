@@ -1,0 +1,12 @@
+tunnel: 20c8a493-5a15-4229-9487-c5c5e7861d52
+
+ingress:
+  - hostname: n8n.mbergsch.com
+    service: http://n8n:5678
+  - hostname: grafana.mbergsch.com
+    service: http://grafana:3000
+  - hostname: hermes.mbergsch.com
+    service: http://hermes-web-ui:8080
+  - hostname: ai.mbergsch.com
+    service: http://open-webui:8080
+  - service: http_status:404

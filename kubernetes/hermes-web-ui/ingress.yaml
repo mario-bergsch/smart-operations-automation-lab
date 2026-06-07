@@ -1,0 +1,64 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hermes-vault-ingress
+  namespace: hermes
+  labels:
+    app: hermes-vault
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - hermes.mbergsch.com
+    secretName: hermes-tls-cert
+  rules:
+  - host: hermes.mbergsch.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hermes-web-ui
+            port:
+              number: 80
+
+---
+# Ingress for API backend
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hermes-api-ingress
+  namespace: hermes
+  labels:
+    app: hermes-vault
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - vault.mbergsch.com
+    secretName: vault-tls-cert
+  rules:
+  - host: vault.mbergsch.com
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: hermes-api
+            port:
+              number: 8000

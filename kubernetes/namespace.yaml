@@ -1,0 +1,59 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hermes
+  labels:
+    name: hermes
+    app: hermes-vault
+
+---
+# Service Account for Hermes workloads
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: hermes-sa
+  namespace: hermes
+  labels:
+    app: hermes-vault
+
+---
+# Role for Hermes (read/write PVC, read ConfigMaps/Secrets)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: hermes-role
+  namespace: hermes
+  labels:
+    app: hermes-vault
+rules:
+- apiGroups: [""]
+  resources: ["persistentvolumeclaims"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["pods", "pods/log"]
+  verbs: ["get", "list", "watch"]
+
+---
+# RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: hermes-rolebinding
+  namespace: hermes
+  labels:
+    app: hermes-vault
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: hermes-role
+subjects:
+- kind: ServiceAccount
+  name: hermes-sa
+  namespace: hermes

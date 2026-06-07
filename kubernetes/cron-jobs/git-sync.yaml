@@ -1,0 +1,113 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: git-sync-script
+  namespace: hermes
+data:
+  sync.sh: |
+    #!/bin/bash
+    set -e
+
+    VAULT_PATH="/vault"
+
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting git sync..."
+    cd "$VAULT_PATH"
+    git config --global user.email "hermes-sync@k3s.local"
+    git config --global user.name "Hermes k3s Sync"
+
+    # Fetch from remote
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Fetching from GitHub..."
+    git fetch origin main || { echo "Fetch failed"; exit 1; }
+
+    # Check if remote is ahead
+    LOCAL_HEAD=$(git rev-parse HEAD)
+    REMOTE_HEAD=$(git rev-parse origin/main)
+
+    if [ "$LOCAL_HEAD" != "$REMOTE_HEAD" ]; then
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Syncing from remote..."
+      git reset --hard origin/main
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Sync completed"
+    else
+      echo "[$(date '+%Y-%m-%d %H:%M:%S')] Already up-to-date"
+    fi
+
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] HEAD: $(git rev-parse --short HEAD)"
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: git-sync
+  namespace: hermes
+  labels:
+    app: hermes
+    component: git-sync
+spec:
+  # Run hourly at top of each hour (0 * * * *)
+  schedule: "0 * * * *"
+
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 600
+      backoffLimit: 2
+      ttlSecondsAfterFinished: 3600
+
+      template:
+        metadata:
+          labels:
+            app: hermes
+            job-type: git-sync
+
+        spec:
+          serviceAccountName: hermes-sa
+
+          containers:
+          - name: git-sync
+            image: alpine/git:latest
+            imagePullPolicy: IfNotPresent
+
+            command:
+            - /bin/sh
+            - /scripts/sync.sh
+
+            env:
+            - name: GIT_SSH_COMMAND
+              value: "ssh -i /etc/git-credentials/ssh-privatekey -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+
+            volumeMounts:
+            - name: vault-storage
+              mountPath: /vault
+            - name: git-sync-script
+              mountPath: /scripts
+              readOnly: true
+            - name: github-ssh-key
+              mountPath: /etc/git-credentials
+              readOnly: true
+
+            resources:
+              requests:
+                memory: "256Mi"
+                cpu: "100m"
+              limits:
+                memory: "512Mi"
+                cpu: "500m"
+
+          restartPolicy: Never
+
+          volumes:
+          - name: vault-storage
+            persistentVolumeClaim:
+              claimName: vault-storage-pvc
+          - name: git-sync-script
+            configMap:
+              name: git-sync-script
+              defaultMode: 0755
+          - name: github-ssh-key
+            secret:
+              secretName: github-ssh-key
+              defaultMode: 0600
