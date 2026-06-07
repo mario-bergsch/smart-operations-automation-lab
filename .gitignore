@@ -1,0 +1,38 @@
+# Credentials
+*.key
+*.pem
+~/.ssh/*
+credentials.json
+.env
+.env.local
+secrets/
+cloudflared/*.json
+
+# Kubernetes
+kubeconfig
+.kube/config
+
+# Generated files
+*.log
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Docker
+.docker/
+*.tar
+*.tar.gz
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Local
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+# Secrets & automation scripts
+setup-slack-automation.*

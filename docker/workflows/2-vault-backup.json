@@ -1,0 +1,136 @@
+{
+  "name": "Vault Backup Manager",
+  "description": "Daily backup of all vault data at 02:00 UTC",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "cronExpression",
+              "value": "0 2 * * *"
+            }
+          ]
+        }
+      },
+      "id": "trigger-daily-2am",
+      "name": "Trigger Daily 02:00",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://hermes-api:8000/api/vault/search?q=*",
+        "method": "GET",
+        "responseFormat": "json"
+      },
+      "id": "node-fetch-vault-data",
+      "name": "Fetch All Vault Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  timestamp: new Date().toISOString(),\n  backupCount: $json.results ? $json.results.length : 0,\n  vaultSnapshot: $json,\n  backupStatus: 'in-progress'\n}"
+      },
+      "id": "node-prepare-backup",
+      "name": "Prepare Backup Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        650,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://hermes-api:8000/api/vault/backup",
+        "sendBody": true,
+        "bodyParametersJson": "={{ JSON.stringify($json) }}"
+      },
+      "id": "node-save-backup",
+      "name": "Save Backup to API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        850,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  timestamp: new Date().toISOString(),\n  status: 'completed',\n  backupId: $('Prepare Backup Data').first().json.timestamp,\n  itemsBackedUp: $('Prepare Backup Data').first().json.backupCount,\n  message: `Backup completed at ${new Date().toISOString()}`\n}"
+      },
+      "id": "node-backup-complete",
+      "name": "Backup Complete",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1050,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Trigger Daily 02:00": {
+      "main": [
+        [
+          {
+            "node": "Fetch All Vault Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch All Vault Data": {
+      "main": [
+        [
+          {
+            "node": "Prepare Backup Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Backup Data": {
+      "main": [
+        [
+          {
+            "node": "Save Backup to API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Backup to API": {
+      "main": [
+        [
+          {
+            "node": "Backup Complete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "errorWorkflow": "",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all"
+  },
+  "staticData": null
+}

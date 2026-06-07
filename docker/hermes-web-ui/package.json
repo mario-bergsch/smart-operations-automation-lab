@@ -1,0 +1,14 @@
+{
+  "name": "hermes-web-ui",
+  "version": "1.0.0",
+  "description": "Hermes Vault Web UI",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build": "echo 'No build required for static files'"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "axios": "^1.6.2"
+  }
+}

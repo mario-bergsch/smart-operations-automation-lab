@@ -1,0 +1,163 @@
+{
+  "name": "Git Sync Monitor",
+  "description": "Monitors git sync status every 30 minutes and triggers sync if needed",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 30,
+              "unit": "minutes"
+            }
+          ]
+        }
+      },
+      "id": "trigger-every-30min",
+      "name": "Cron Every 30min",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://hermes-api:8000/api/health",
+        "method": "GET",
+        "responseFormat": "json"
+      },
+      "id": "node-check-git-status",
+      "name": "Check Git Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.git_accessible }}",
+              "operation": "true"
+            }
+          ]
+        }
+      },
+      "id": "node-if-git-synced",
+      "name": "Git Synced?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        650,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  timestamp: new Date().toISOString(),\n  gitStatus: 'synced',\n  message: 'Git repository is in sync',\n  nextCheckIn: '30 minutes'\n}"
+      },
+      "id": "node-git-synced-response",
+      "name": "Git Already Synced",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        850,
+        150
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://hermes-api:8000/api/git/sync",
+        "method": "POST",
+        "responseFormat": "json"
+      },
+      "id": "node-trigger-sync",
+      "name": "Trigger Git Sync",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [
+        850,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return {\n  timestamp: new Date().toISOString(),\n  gitStatus: 'syncing',\n  message: 'Git sync triggered',\n  response: $json\n}"
+      },
+      "id": "node-sync-response",
+      "name": "Sync Triggered",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1050,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "Cron Every 30min": {
+      "main": [
+        [
+          {
+            "node": "Check Git Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Git Status": {
+      "main": [
+        [
+          {
+            "node": "Git Synced?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Git Synced?": {
+      "main": [
+        [
+          {
+            "node": "Git Already Synced",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Trigger Git Sync",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger Git Sync": {
+      "main": [
+        [
+          {
+            "node": "Sync Triggered",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "errorWorkflow": "",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all"
+  },
+  "staticData": null
+}
