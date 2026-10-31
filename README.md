@@ -2,6 +2,8 @@
 
 # Smart Operations Automation Lab
 
+> **Abgeschlossenes Projekt (Juni 2026).** Wird nicht mehr weiterentwickelt. Die zugehörige Infrastruktur ist außer Betrieb. Das Repo bleibt als Lernstand sichtbar.
+
 Persönliches Lern- und Portfolio-Projekt: Konfiguration für eine selbst gehostete Automatisierungsumgebung mit n8n, einer eigenen Vault-API (FastAPI) und Monitoring (Prometheus/Grafana). Ziel ist, Workflows aus der Produktionslogistik (z. B. Schichtübergabe) lokal zu automatisieren.
 
 ---
@@ -26,11 +28,11 @@ Persönliches Lern- und Portfolio-Projekt: Konfiguration für eine selbst gehost
 | Docker-Compose-Stack | Konfiguration vorhanden | `docker/docker-compose.yml` |
 | n8n-Workflows | Als JSON exportiert | `docker/workflows/` |
 | Kubernetes-Manifeste | Vorhanden, YAML syntaktisch gültig | `kubernetes/` |
-| k3s-Cluster | In Arbeit — Betrieb nicht im Repo dokumentiert | — |
-| n8n auf k3s | Geplant (kein Manifest vorhanden) | — |
-| Monitoring auf k3s | Geplant (kein Manifest vorhanden) | — |
+| k3s-Cluster | Nicht fertiggestellt | — |
+| n8n auf k3s | Nicht umgesetzt | — |
+| Monitoring auf k3s | Nicht umgesetzt | — |
 
-Status-Labels: **Vorhanden** = Datei im Repo · **In Arbeit** = begonnen, nicht belegt · **Geplant** = noch nicht begonnen.
+Status-Labels: **Vorhanden** = Datei im Repo · **Nicht fertiggestellt** = begonnen, nicht abgeschlossen · **Nicht umgesetzt** = nicht mehr verfolgt.
 
 ---
 
@@ -67,7 +69,7 @@ Anleitung für den Cluster-Aufbau: [`docs/DEPLOYMENT-GUIDE.md`](docs/DEPLOYMENT-
 
 ---
 
-## Nächste Schritte
+## Ursprünglich geplante Schritte (nicht mehr umgesetzt)
 
 - [ ] k3s-Cluster fertigstellen und Betrieb dokumentieren (`kubectl get nodes` als Nachweis)
 - [ ] Manifeste für n8n und Monitoring auf k3s erstellen
