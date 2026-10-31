@@ -25,8 +25,10 @@ logger.addHandler(handler)
 # Configuration from environment
 VAULT_PATH = Path(os.getenv("VAULT_PATH", "/vault"))
 LOG_LEVEL = os.getenv("LOG_LEVEL", "info").upper()
-API_KEY = os.getenv("API_KEY", None)  # Optional: None means no auth required
-REQUIRE_AUTH = API_KEY is not None
+API_KEY = os.getenv("API_KEY")
+if not API_KEY:
+    raise RuntimeError("API_KEY ist nicht gesetzt - Start ohne Authentifizierung ist deaktiviert")
+REQUIRE_AUTH = True
 
 # Prometheus metrics
 request_count = Counter('hermes_api_requests_total', 'Total API requests', ['method', 'endpoint', 'status'])
@@ -90,7 +92,7 @@ async def verify_api_key(x_api_key: str = Header(None)):
 
     if x_api_key != API_KEY:
         request_count.labels(method="GET", endpoint="/api/*", status=401).inc()
-        logger.warning(f"Invalid API key attempt: {x_api_key[:10]}...")
+        logger.warning("Invalid API key attempt")
         raise HTTPException(status_code=401, detail="Invalid API key")
 
     return x_api_key

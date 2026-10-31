@@ -1,41 +1,41 @@
 # CLAUDE.md — Smart Operations Automation Lab
 
 > Projektspezifisches Gedächtnis für Claude Code Sessions in diesem Repo.
-> Globales Gedächtnis: /Users/sandman/Documents/Hermes-Master/CLAUDE.md
 
 ## Projekt-Kontext
 
 **Projekt:** Smart Operations Automation Lab
-**Owner:** Mario Bergsch (devops@mbergsch.com)
-**Status:** In Arbeit 🔄
-**Deadline:** 2026-06-30
+**Owner:** Mario Bergsch
+**Status:** In Arbeit
 
 ## Ziel
 
-Lokale Automatisierungs-Infrastruktur: k3s + n8n + lokale KI-Dienste.
+Selbst gehostete Automatisierungsumgebung: Docker-Compose-Stack (n8n, Vault-API, Monitoring) und Kubernetes-Manifeste für k3s.
 
-## Tech Stack
+## Stand (belegt durch Dateien im Repo)
 
-| Tool | Zweck | Status |
-|------|-------|--------|
-| k3s | Lokaler Kubernetes Cluster | In Arbeit 🔄 |
-| n8n | Workflow Automatisierung | Geplant |
-| Docker | Container | Basis vorhanden |
-| Claude API | KI-Integration | Geplant |
+| Komponente | Status |
+|------------|--------|
+| Docker-Compose-Stack (7 Dienste) | Vorhanden |
+| n8n-Workflows (3 JSON-Exporte) | Vorhanden |
+| Kubernetes-Manifeste (hermes-api, hermes-web-ui, CronJobs) | Vorhanden |
+| k3s-Cluster | In Arbeit — Betrieb nicht dokumentiert |
+| n8n/Monitoring auf k3s | Geplant |
 
-## Offene Aufgaben (vor 2026-06-30)
+## Offene Aufgaben
 
-- [ ] k3s Setup finalisieren
-- [ ] n8n auf k3s deployen
-- [ ] Ersten Workflow testen
-- [ ] Dokumentation für Vault erstellen
+- [ ] k3s-Cluster fertigstellen, Nachweis ablegen (`kubectl get nodes` / `kubectl get pods -A`)
+- [ ] n8n-Manifest für k3s erstellen
+- [ ] Ersten Workflow auf k3s testen und Ergebnis dokumentieren
 
 ## Arbeitsregeln
 
-- Sprache: Deutsch (außer Code/YAML/Kubernetes Manifeste)
-- Nur was getestet wurde — keine Halluzinationen
-- Status-Labels: Nachgewiesen / Validiert / Geplant / In Arbeit
+- Sprache: Deutsch (außer Code/YAML/Kubernetes-Manifeste)
+- Nur eintragen, was im Repo belegt ist — keine Live-URLs, Uptime- oder Leistungszahlen ohne Nachweis
+- Keine internen IPs, Benutzernamen, Tunnel-IDs oder lokalen Pfade committen
+- Status-Labels: Vorhanden / In Arbeit / Geplant
 
 ## Session Changelog
 
-2026-06-06 | CLAUDE.md erstellt | Gedächtnis für dieses Repo aktiviert
+2026-06-06 | CLAUDE.md erstellt
+2026-10-31 | Bereinigung: Merge-Konflikte gelöst, unbelegte Claims entfernt, Secrets verpflichtend, interne IPs/IDs entfernt

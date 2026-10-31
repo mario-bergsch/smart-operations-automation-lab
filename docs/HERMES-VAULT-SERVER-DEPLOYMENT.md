@@ -92,7 +92,7 @@ df -h /var/lib/rancher/k3s/storage/
 
 ```bash
 # Apply all manifests in order
-cd /Users/sandman/Documents/Hermes-Master/07-Infrastructure
+cd <PFAD-ZUM-REPO>
 
 # 1. Namespace & RBAC
 kubectl apply -f kubernetes/namespace.yaml
@@ -534,4 +534,4 @@ kubectl -n hermes exec deployment/hermes-api -- \
 
 **Document Status:** Complete  
 **Last Updated:** 2026-05-30  
-**Next Review:** After Phase 1 k3s cluster is live (est. 2026-06-07)
+**Next Review:** Nach Fertigstellung des k3s-Clusters

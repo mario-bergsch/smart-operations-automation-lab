@@ -25,8 +25,8 @@ status: complete
 # 1. SSH Config
 cat >> ~/.ssh/config <<EOF
 Host k3s-master
-    HostName 192.168.178.151
-    User mario
+    HostName <MASTER-IP>
+    User <USER>
     IdentityFile ~/.ssh/id_ed25519
 EOF
 
@@ -37,7 +37,7 @@ TOKEN=$(sudo cat /var/lib/rancher/k3s/server/node-token)
 
 # 3. Worker k3s
 ssh k3s-worker
-curl -sfL https://get.k3s.io | K3S_URL=https://192.168.178.151:6443 \
+curl -sfL https://get.k3s.io | K3S_URL=https://<MASTER-IP>:6443 \
   K3S_TOKEN=$TOKEN sh -
 
 # 4. Deploy Services
@@ -61,8 +61,8 @@ network:
     eth0:
       dhcp4: false
       addresses:
-        - 192.168.178.151/24
-      gateway4: 192.168.178.1
+        - <MASTER-IP>/24
+      gateway4: <GATEWAY-IP>
       nameservers:
         addresses: [8.8.8.8, 8.8.4.4]
 
@@ -110,7 +110,7 @@ TOKEN=$(sudo cat /var/lib/rancher/k3s/server/node-token)
 ```bash
 ssh k3s-worker
 
-curl -sfL https://get.k3s.io | K3S_URL=https://192.168.178.151:6443 \
+curl -sfL https://get.k3s.io | K3S_URL=https://<MASTER-IP>:6443 \
   K3S_TOKEN=<paste-token> sh -
 
 sudo systemctl status k3s-agent
@@ -282,15 +282,15 @@ ingress:
   - hostname: ai.mbergsch.com
     service: http://10.43.166.176:80
   - hostname: n8n.mbergsch.com
-    service: http://192.168.178.151:5678
+    service: http://<MASTER-IP>:5678
   - hostname: grafana.mbergsch.com
-    service: http://192.168.178.151:3000
+    service: http://<MASTER-IP>:3000
   - hostname: prometheus.mbergsch.com
-    service: http://192.168.178.151:9090
+    service: http://<MASTER-IP>:9090
   - hostname: loki.mbergsch.com
-    service: http://192.168.178.151:3100
+    service: http://<MASTER-IP>:3100
   - hostname: vault-api.mbergsch.com
-    service: http://192.168.178.151:8000
+    service: http://<MASTER-IP>:8000
   - service: http_status:404
 EOF
 
@@ -380,4 +380,4 @@ sudo systemctl start k3s
 ---
 
 **Last Updated:** 2026-06-07  
-**Status:** ✅ Complete
+**Status:** Anleitung (Betrieb nicht im Repo dokumentiert)

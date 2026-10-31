@@ -1,4 +1,4 @@
-tunnel: 20c8a493-5a15-4229-9487-c5c5e7861d52
+tunnel: <DEINE-TUNNEL-ID>   # cloudflared tunnel list
 
 ingress:
   - hostname: n8n.mbergsch.com

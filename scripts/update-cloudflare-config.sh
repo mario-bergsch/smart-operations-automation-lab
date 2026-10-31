@@ -4,8 +4,11 @@
 
 set -e
 
-TUNNEL_ID="340a794c-05e7-44bb-bd56-8c4a2f91636c"
-CREDS_FILE="/home/mario/.cloudflared/340a794c-05e7-44bb-bd56-8c4a2f91636c.json"
+# Werte per Umgebungsvariable setzen, z. B.:
+#   TUNNEL_ID=... MASTER_IP=... bash update-cloudflare-config.sh
+TUNNEL_ID="${TUNNEL_ID:?TUNNEL_ID setzen (cloudflared tunnel list)}"
+MASTER_IP="${MASTER_IP:?MASTER_IP setzen}"
+CREDS_FILE="${CREDS_FILE:-$HOME/.cloudflared/${TUNNEL_ID}.json}"
 CONFIG_FILE="/etc/cloudflared/config.yml"
 
 echo "🔧 Updating Cloudflare Tunnel Configuration..."
@@ -26,23 +29,23 @@ ingress:
 
   # Automation (n8n)
   - hostname: n8n.mbergsch.com
-    service: http://192.168.178.151:5678
+    service: http://${MASTER_IP}:5678
 
   # Monitoring (Grafana)
   - hostname: grafana.mbergsch.com
-    service: http://192.168.178.151:3000
+    service: http://${MASTER_IP}:3000
 
   # Monitoring (Prometheus)
   - hostname: prometheus.mbergsch.com
-    service: http://192.168.178.151:9090
+    service: http://${MASTER_IP}:9090
 
   # Logging (Loki)
   - hostname: loki.mbergsch.com
-    service: http://192.168.178.151:3100
+    service: http://${MASTER_IP}:3100
 
   # Hermes Vault API
   - hostname: vault-api.mbergsch.com
-    service: http://192.168.178.151:8000
+    service: http://${MASTER_IP}:8000
 
   # Default fallback
   - service: http_status:404
@@ -51,9 +54,9 @@ EOF
 echo "✅ Config aktualisiert"
 echo ""
 echo "📋 Neue Services:"
-echo "   - prometheus.mbergsch.com → 192.168.178.151:9090"
-echo "   - loki.mbergsch.com → 192.168.178.151:3100"
-echo "   - vault-api.mbergsch.com → 192.168.178.151:8000"
+echo "   - prometheus.mbergsch.com → ${MASTER_IP}:9090"
+echo "   - loki.mbergsch.com → ${MASTER_IP}:3100"
+echo "   - vault-api.mbergsch.com → ${MASTER_IP}:8000"
 echo ""
 echo "🔄 Restarting cloudflared..."
 sudo systemctl restart cloudflared

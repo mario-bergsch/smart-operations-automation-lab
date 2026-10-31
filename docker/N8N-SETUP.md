@@ -4,7 +4,7 @@
 
 Alle Services laufen unter `docker-compose up -d`:
 - **n8n**: http://localhost:5678
-- **n8n Database**: postgresql://n8n:n8n-dev-password@localhost:5432/n8n
+- **n8n Database**: postgresql://n8n:${N8N_DB_PASSWORD}@localhost:5432/n8n (Passwort aus .env)
 - **Hermes API**: http://localhost:8000
 - **Web UI**: http://localhost:8080
 

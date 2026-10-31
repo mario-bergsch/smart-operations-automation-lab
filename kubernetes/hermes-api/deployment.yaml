@@ -46,6 +46,11 @@ spec:
           value: "0.0.0.0"
         - name: API_PORT
           value: "8000"
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: hermes-api-secret   # kubectl create secret generic hermes-api-secret --from-literal=api-key=... -n hermes
+              key: api-key
         volumeMounts:
         - name: vault-storage
           mountPath: /vault
